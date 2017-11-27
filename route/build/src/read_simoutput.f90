@@ -12,8 +12,8 @@ contains
  ! new subroutine: read dimensions from runoff file
  ! *********************************************************************
  subroutine get_qDims(fname,           &  ! input: filename
-                      vname_hruid,     &  ! input: name of coordinate dimension HRUid
-                      vname_time,      &  ! input: name of coordinate dimension time
+                      dname_hruid,     &  ! input: name of hruid dimension
+                      dname_time,      &  ! input: name of time dimension
                       units_time,      &  ! output: time units
                       nTime,           &  ! output: number of time elements
                       nHRU,            &  ! output: number of HRUs in the runoff data file
@@ -21,8 +21,8 @@ contains
  implicit none
  ! input variables
  character(*), intent(in)        :: fname        ! filename
- character(*), intent(in)        :: vname_hruid  ! coordinate variable for HRUs
- character(*), intent(in)        :: vname_time   ! coordinate variable for time
+ character(*), intent(in)        :: dname_hruid  ! coordinate variable for HRUs
+ character(*), intent(in)        :: dname_time   ! coordinate variable for time
  ! output variables
  character(*), intent(out)       :: units_time   ! time units
  integer(i4b), intent(out)       :: nTime        ! number of time elements
@@ -42,24 +42,24 @@ contains
  if(ierr/=0)then; message=trim(message)//trim(nf90_strerror(ierr))//'; name='//trim(fname); return; endif
 
  ! get the ID of the time dimension
- ierr = nf90_inq_dimid(ncid, vname_time, idimID_time)
- if(ierr/=0)then; message=trim(message)//trim(nf90_strerror(ierr))//'; name='//trim(vname_time); return; endif
+ ierr = nf90_inq_dimid(ncid, dname_time, idimID_time)
+ if(ierr/=0)then; message=trim(message)//trim(nf90_strerror(ierr))//'; name='//trim(dname_time); return; endif
 
  ! get the length of the time dimension
  ierr = nf90_inquire_dimension(ncid, idimID_time, len=nTime)
  if(ierr/=0)then; message=trim(message)//trim(nf90_strerror(ierr)); return; endif
 
  ! get the ID of the time variable
- ierr = nf90_inq_varid(ncid, trim(vname_time), ivarID)
+ ierr = nf90_inq_varid(ncid, trim(dname_time), ivarID)
  if(ierr/=0)then; message=trim(message)//trim(nf90_strerror(ierr)); return; endif
- 
+
  ! get the time units
  ierr = nf90_get_att(ncid, ivarID, 'units', units_time)
  if(ierr/=0)then; message=trim(message)//trim(nf90_strerror(ierr)); return; endif
 
  ! get the ID of the HRU dimension
- ierr = nf90_inq_dimid(ncid, vname_hruID, idimID_hru)
- if(ierr/=0)then; message=trim(message)//trim(nf90_strerror(ierr))//'; name='//trim(vname_hruID); return; endif
+ ierr = nf90_inq_dimid(ncid, dname_hruid, idimID_hru)
+ if(ierr/=0)then; message=trim(message)//trim(nf90_strerror(ierr))//'; name='//trim(dname_hruid); return; endif
 
  ! get the length of the HRU dimension
  ierr = nf90_inquire_dimension(ncid, idimID_hru, len=nHRU)
